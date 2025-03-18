@@ -1,5 +1,12 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
     font-family: monospace;
-    background-color:#d1d5db;
+    background-color:#FFFFFF;
+}
+
+:root.dark {
+    background-color: #121212;
 }
