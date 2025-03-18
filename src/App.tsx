@@ -62,7 +62,7 @@ const App = () => {
           <h1 className=" text-black dark:text-white font-bold text-3xl">
             Task List
           </h1>
-          <button className="flex items-center gap-1 justify-center bg-white dark:bg-gray-800 py-2 px-3 rounded-2xl text-2xl dark:text-white transition delay-50 duration-300 ease-in-out cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">
+          <button className="flex items-center gap-1 justify-center bg-white dark:bg-gray-800 py-2 px-3 rounded-2xl text-2xl dark:text-white transition delay-50 duration-300 ease-in-out cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700">
             <AddIcon fontSize="medium" />
             <span>New</span>
           </button>
@@ -71,7 +71,8 @@ const App = () => {
           {tasks?.map((task, index) => (
             <div
               key={index}
-              className="relative bg-gray-200 dark:bg-gray-600 flex flex-col rounded-2xl m-8"
+              className="relative bg-gray-200 dark:bg-gray-600 flex flex-col rounded-2xl m-8 cursor-pointer"
+              onClick={() => toggleComplete(index)}
             >
               <div className="py-4 ps-8">
                 <h1
@@ -93,7 +94,6 @@ const App = () => {
                 checked={task.completed}
                 type="checkbox"
                 className="absolute end-6 top-1/2 -translate-y-1/2 h-8 w-8 accent-amber-400  dark:accent-teal-500"
-                onChange={() => toggleComplete(index)}
               />
             </div>
           ))}
