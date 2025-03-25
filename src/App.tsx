@@ -6,20 +6,12 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import ThemeContext from "./ThemeContext.ts";
 import { Task } from "./model.ts";
 import { taskReducer } from "./todoReducer.ts";
-import CreateTaskModal from "./CreateTaskModal.tsx";
 
 const App = () => {
   const [tasks, dispatch] = useReducer(taskReducer, []);
   const themeContext = useContext(ThemeContext);
-  const [open, setOpen] = useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
 
   // Hardcoded initial to-do items
   const initialTasks: Task[] = [
@@ -62,8 +54,7 @@ const App = () => {
 
   return (
     <>
-      <CreateTaskModal open={open} onClose={handleClose} onAddTask={addTask} />
-      <button className="m-6" onClick={themeContext.toggleTheme}>
+      <button className="m-6 cursor-pointer" onClick={themeContext.toggleTheme}>
         {themeContext.theme === "light" ? (
           <DarkModeIcon fontSize="large" />
         ) : (
@@ -72,20 +63,62 @@ const App = () => {
       </button>
       <div className="flex flex-col w-140 mx-auto my-20">
         <div
-          className={`flex justify-between items-center bg-amber-400 dark:bg-teal-500 h-40 rounded-t-3xl px-10 ${
+          className={`bg-amber-400 dark:bg-teal-500 h-80 rounded-t-3xl px-10 ${
             !tasks.length && "rounded-b-3xl"
           }`}
         >
-          <h1 className=" text-black dark:text-white font-bold text-3xl">
-            Task List
-          </h1>
-          <button
-            className="flex items-center gap-1 justify-center bg-white dark:bg-gray-800 py-2 px-3 rounded-2xl text-2xl dark:text-white transition delay-50 duration-300 ease-in-out cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
-            onClick={() => handleClickOpen()}
-          >
-            <AddIcon fontSize="medium" />
-            <span>New</span>
-          </button>
+          <div className="flex flex-col items-center py-4">
+            <label htmlFor="search" className="text-xl font-bold">
+              Search
+            </label>
+            <input
+              type="text"
+              id="search"
+              className="bg-white rounded-xl p-2"
+            />
+          </div>
+          <hr />
+          <div className="flex justify-between items-center pt-4">
+            <div className="flex flex-col">
+              <div className="flex flex-col">
+                <label htmlFor="title" className="text-lg font-medium">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="rounded-xl p-2 bg-white"
+                />
+              </div>
+              <div className="flex flex-col pt-2">
+                <label htmlFor="description" className="text-lg font-medium">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="bg-white rounded-xl p-2 resize-none w-90 h-20"
+                />
+              </div>
+            </div>
+
+            <button
+              className="flex items-center gap-1 justify-center bg-white dark:bg-gray-800 py-2 px-3 rounded-2xl text-2xl dark:text-white transition delay-50 duration-300 ease-in-out cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+              onClick={() => {
+                if (newTitle && newDescription) {
+                  addTask(newTitle, newDescription);
+                  setNewTitle("");
+                  setNewDescription("");
+                }
+              }}
+            >
+              <AddIcon fontSize="medium" />
+              <span>New</span>
+            </button>
+          </div>
         </div>
         <div className="bg-gray-100 dark:bg-gray-800 rounded-b-3xl">
           {tasks.map((task, index) => (

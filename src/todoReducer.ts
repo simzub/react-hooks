@@ -4,12 +4,12 @@ export const taskReducer = (state: Task[], action: TaskAction) => {
   switch (action.type) {
     case "ADD_TASK":
       return [
-        ...state,
         {
           title: action.payload.title,
           description: action.payload.description,
           completed: false,
         },
+        ...state,
       ];
     case "TOGGLE_COMPLETE":
       return state.map((task, index) =>
