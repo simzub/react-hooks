@@ -2,16 +2,28 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { useContext, useEffect, useReducer, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import ThemeContext from "./ThemeContext.ts";
 import { Task } from "./model.ts";
 import { taskReducer } from "./todoReducer.ts";
+import useDebounce from "./useDebounce.ts";
 
 const App = () => {
   const [tasks, dispatch] = useReducer(taskReducer, []);
   const themeContext = useContext(ThemeContext);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   // Hardcoded initial to-do items
   const initialTasks: Task[] = [
@@ -38,19 +50,43 @@ const App = () => {
   // Set initial to-do items when the component mounts
   useEffect(() => {
     dispatch({ type: "SET_INITIAL_TASKS", payload: initialTasks });
+
+    if (titleInputRef.current) {
+      titleInputRef.current.focus();
+    }
   }, []);
 
-  const toggleComplete = (index: number) => {
-    dispatch({ type: "TOGGLE_COMPLETE", payload: index });
-  };
+  const toggleComplete = useCallback(
+    (index: number) => {
+      dispatch({ type: "TOGGLE_COMPLETE", payload: index });
+    },
+    [dispatch]
+  );
 
-  const addTask = (title: string, description: string) => {
-    dispatch({ type: "ADD_TASK", payload: { title, description } });
-  };
+  const addTask = useCallback(
+    (title: string, description: string) => {
+      dispatch({ type: "ADD_TASK", payload: { title, description } });
+      if (titleInputRef.current) {
+        titleInputRef.current.focus();
+      }
+    },
+    [dispatch]
+  );
 
-  const removeTask = (index: number) => {
-    dispatch({ type: "REMOVE_TASK", payload: index });
-  };
+  const removeTask = useCallback(
+    (index: number) => {
+      dispatch({ type: "REMOVE_TASK", payload: index });
+    },
+    [dispatch]
+  );
+
+  const filteredTasks = useMemo(
+    () =>
+      tasks.filter((task) =>
+        task.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+      ),
+    [tasks, debouncedSearchQuery]
+  );
 
   return (
     <>
@@ -74,6 +110,8 @@ const App = () => {
             <input
               type="text"
               id="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-white rounded-xl p-2"
             />
           </div>
@@ -87,6 +125,7 @@ const App = () => {
                 <input
                   type="text"
                   id="title"
+                  ref={titleInputRef}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="rounded-xl p-2 bg-white"
@@ -121,7 +160,7 @@ const App = () => {
           </div>
         </div>
         <div className="bg-gray-100 dark:bg-gray-800 rounded-b-3xl">
-          {tasks.map((task, index) => (
+          {filteredTasks.map((task, index) => (
             <div
               key={index}
               className="relative bg-gray-200 dark:bg-gray-600 flex flex-col rounded-2xl m-8"
