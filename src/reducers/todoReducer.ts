@@ -1,4 +1,4 @@
-import { Task, TaskAction } from "./model.ts";
+import { Task, TaskAction } from "../models/model.ts";
 
 export const taskReducer = (state: Task[], action: TaskAction) => {
   switch (action.type) {
